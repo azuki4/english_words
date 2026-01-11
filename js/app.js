@@ -11,9 +11,11 @@ class StatsManager {
     async getTotalWords() {
         try {
             const snapshot = await db.collection(COLLECTION_NAME).get();
+            console.log('総単語数:', snapshot.size);
             return snapshot.size;
         } catch (error) {
             console.error('Error getting total words:', error);
+            alert('エラー: ' + error.message);
             return 0;
         }
     }
@@ -26,22 +28,29 @@ class StatsManager {
     // 新しい単語を追加
     async addWord(word) {
         try {
+            console.log('単語を追加中:', word);
+
             // 既に存在するか確認
             const querySnapshot = await db.collection(COLLECTION_NAME)
                 .where('word', '==', word)
                 .get();
 
+            console.log('既存の単語数:', querySnapshot.size);
+
             // 存在しない場合のみ追加
             if (querySnapshot.empty) {
-                await db.collection(COLLECTION_NAME).add({
+                const docRef = await db.collection(COLLECTION_NAME).add({
                     word: word,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
+                console.log('単語を追加しました。ID:', docRef.id);
                 return true;
             }
+            console.log('単語は既に存在します');
             return false;
         } catch (error) {
             console.error('Error adding word:', error);
+            alert('エラー: ' + error.message);
             return false;
         }
     }
@@ -49,18 +58,20 @@ class StatsManager {
     // 全ての単語を取得
     async getWords() {
         try {
-            const snapshot = await db.collection(COLLECTION_NAME)
-                .orderBy('word', 'asc')
-                .get();
+            const snapshot = await db.collection(COLLECTION_NAME).get();
 
             const words = [];
             snapshot.forEach(doc => {
                 words.push(doc.data().word);
             });
 
+            // クライアント側でアルファベット順にソート
+            words.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
             return words;
         } catch (error) {
             console.error('Error getting words:', error);
+            alert('エラー: ' + error.message);
             return [];
         }
     }
