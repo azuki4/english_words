@@ -189,7 +189,10 @@ body {
 .section-title {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #999;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 1rem;
@@ -200,20 +203,22 @@ body {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .settings-item {
     display: flex;
     align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.08);
     background: white;
     border: none;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .settings-item:last-child {
@@ -221,11 +226,12 @@ body {
 }
 
 .settings-item:hover {
-    background: #f8f8f8;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    transform: translateX(5px);
 }
 
 .settings-item:active {
-    background: #f0f0f0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
 }
 
 .settings-item-content {
@@ -233,23 +239,29 @@ body {
 }
 
 .settings-item-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #333;
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 0.25rem;
 }
 
 .settings-item-desc {
     font-size: 0.85rem;
-    color: #999;
+    color: #888;
 }
 
-.danger-item {
-    color: #e74c3c;
+.danger-item:hover {
+    background: rgba(231, 76, 60, 0.05);
 }
 
 .danger-item .settings-item-title {
-    color: #e74c3c;
+    background: #e74c3c;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* ナビゲーションのアクティブ状態 */
@@ -294,23 +306,31 @@ body {
 }
 
 .back-button {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
     color: white;
     text-decoration: none;
-    font-size: 0.9rem;
     margin-bottom: 1rem;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .back-button:hover {
-    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-3px);
+}
+
+.back-button:active {
+    transform: translateX(-3px) scale(0.95);
 }
 
 .back-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .page-header h1 {
@@ -322,16 +342,17 @@ body {
 .reset-confirm {
     margin-top: 1rem;
     padding: 1.5rem;
-    background: #fff3cd;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
     border-radius: 12px;
-    border: 1px solid #ffc107;
+    border: 2px solid rgba(102, 126, 234, 0.3);
 }
 
 .reset-confirm-message {
     font-size: 1rem;
-    color: #856404;
+    color: #555;
     margin-bottom: 1rem;
     text-align: center;
+    font-weight: 500;
 }
 
 .reset-confirm-buttons {

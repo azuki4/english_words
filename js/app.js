@@ -37,9 +37,9 @@ class StatsManager {
         return words.length;
     }
 
-    // 今日学習した単語数を取得
+    // 今日学習した単語数を取得（未実装のため暫定的に0を返す）
     getTodayWords() {
-        return parseInt(localStorage.getItem(STORAGE_KEYS.TODAY_COUNT) || '0');
+        return 0;
     }
 
     // 新しい単語を追加
@@ -50,10 +50,6 @@ class StatsManager {
         if (!words.includes(word)) {
             words.push(word);
             localStorage.setItem(STORAGE_KEYS.LEARNED_WORDS, JSON.stringify(words));
-
-            // 今日のカウントを増やす（新規追加の場合のみ）
-            const todayCount = this.getTodayWords();
-            localStorage.setItem(STORAGE_KEYS.TODAY_COUNT, (todayCount + 1).toString());
         }
     }
 
