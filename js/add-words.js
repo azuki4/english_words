@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        function addWord() {
+        async function addWord() {
             const word = wordInput.value.trim();
 
             // 入力チェック
@@ -25,21 +25,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // StatsManagerを使って単語を追加
-            const statsManager = new StatsManager();
-            statsManager.addWord(word);
+            // ボタンを無効化（連続クリック防止）
+            addBtn.disabled = true;
+            addBtn.textContent = '追加中...';
 
-            // 入力欄をクリア
-            wordInput.value = '';
+            try {
+                // StatsManagerを使って単語を追加
+                const statsManager = new StatsManager();
+                const added = await statsManager.addWord(word);
 
-            // 成功メッセージを表示
-            successMessage.style.display = 'block';
-            setTimeout(function() {
-                successMessage.style.display = 'none';
-            }, 2000);
+                // 入力欄をクリア
+                wordInput.value = '';
 
-            // 入力欄にフォーカス
-            wordInput.focus();
+                if (added) {
+                    // 成功メッセージを表示
+                    successMessage.style.display = 'block';
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 2000);
+                } else {
+                    // 既に存在する場合
+                    alert('この単語は既に登録されています');
+                }
+
+                // 入力欄にフォーカス
+                wordInput.focus();
+            } catch (error) {
+                console.error('Error adding word:', error);
+                alert('単語の追加に失敗しました');
+            } finally {
+                // ボタンを有効化
+                addBtn.disabled = false;
+                addBtn.textContent = '追加';
+            }
         }
     }
 });

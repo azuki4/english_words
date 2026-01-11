@@ -14,16 +14,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // 「はい」ボタンをクリック
-        confirmYes.addEventListener('click', function() {
-            const statsManager = new StatsManager();
-            statsManager.resetStats();
+        confirmYes.addEventListener('click', async function() {
+            // ボタンを無効化
+            confirmYes.disabled = true;
+            confirmYes.textContent = 'リセット中...';
 
-            // 確認ダイアログを非表示
-            resetConfirm.style.display = 'none';
-            resetBtn.style.display = 'flex';
+            try {
+                const statsManager = new StatsManager();
+                await statsManager.resetStats();
 
-            // メインページに戻る
-            window.location.href = 'index.html';
+                // 確認ダイアログを非表示
+                resetConfirm.style.display = 'none';
+                resetBtn.style.display = 'flex';
+
+                // メインページに戻る
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Error resetting data:', error);
+                alert('データのリセットに失敗しました');
+
+                // ボタンを有効化
+                confirmYes.disabled = false;
+                confirmYes.textContent = 'はい';
+            }
         });
 
         // 「いいえ」ボタンをクリック

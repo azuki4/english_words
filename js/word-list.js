@@ -6,11 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (wordList && wordCount && emptyMessage) {
         displayWords();
+
+        // Firestoreのリアルタイム更新を監視
+        db.collection('words').onSnapshot(function() {
+            displayWords();
+        });
     }
 
-    function displayWords() {
+    async function displayWords() {
         const statsManager = new StatsManager();
-        const words = statsManager.getWords();
+        const words = await statsManager.getWords();
 
         // 単語数を表示
         wordCount.textContent = words.length;
@@ -26,12 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
         wordList.style.display = 'block';
         emptyMessage.style.display = 'none';
 
-        // アルファベット順にソート
-        const sortedWords = words.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
-        // 単語を表示
+        // 単語を表示（既にアルファベット順にソート済み）
         wordList.innerHTML = '';
-        sortedWords.forEach(function(word) {
+        words.forEach(function(word) {
             const wordItem = document.createElement('div');
             wordItem.className = 'word-item';
             wordItem.textContent = word;

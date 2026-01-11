@@ -1,40 +1,21 @@
-// ローカルストレージのキー
-const STORAGE_KEYS = {
-    LEARNED_WORDS: 'learnedWords',
-    TODAY_DATE: 'todayDate',
-    TODAY_COUNT: 'todayCount'
-};
+// Firestoreのコレクション名
+const COLLECTION_NAME = 'words';
 
 // 統計データを管理するクラス
 class StatsManager {
     constructor() {
-        this.init();
-    }
-
-    init() {
-        // 学習済み単語のセット（重複を防ぐ）
-        if (!localStorage.getItem(STORAGE_KEYS.LEARNED_WORDS)) {
-            localStorage.setItem(STORAGE_KEYS.LEARNED_WORDS, JSON.stringify([]));
-        }
-
-        // 日付が変わっていたら今日のカウントをリセット
-        this.checkAndResetDailyCount();
-    }
-
-    checkAndResetDailyCount() {
-        const today = new Date().toDateString();
-        const savedDate = localStorage.getItem(STORAGE_KEYS.TODAY_DATE);
-
-        if (savedDate !== today) {
-            localStorage.setItem(STORAGE_KEYS.TODAY_DATE, today);
-            localStorage.setItem(STORAGE_KEYS.TODAY_COUNT, '0');
-        }
+        this.wordsCache = [];
     }
 
     // 総単語数を取得
-    getTotalWords() {
-        const words = JSON.parse(localStorage.getItem(STORAGE_KEYS.LEARNED_WORDS) || '[]');
-        return words.length;
+    async getTotalWords() {
+        try {
+            const snapshot = await db.collection(COLLECTION_NAME).get();
+            return snapshot.size;
+        } catch (error) {
+            console.error('Error getting total words:', error);
+            return 0;
+        }
     }
 
     // 今日学習した単語数を取得（未実装のため暫定的に0を返す）
@@ -43,41 +24,80 @@ class StatsManager {
     }
 
     // 新しい単語を追加
-    addWord(word) {
-        const words = JSON.parse(localStorage.getItem(STORAGE_KEYS.LEARNED_WORDS) || '[]');
+    async addWord(word) {
+        try {
+            // 既に存在するか確認
+            const querySnapshot = await db.collection(COLLECTION_NAME)
+                .where('word', '==', word)
+                .get();
 
-        // 既に学習済みでない場合のみ追加
-        if (!words.includes(word)) {
-            words.push(word);
-            localStorage.setItem(STORAGE_KEYS.LEARNED_WORDS, JSON.stringify(words));
+            // 存在しない場合のみ追加
+            if (querySnapshot.empty) {
+                await db.collection(COLLECTION_NAME).add({
+                    word: word,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding word:', error);
+            return false;
         }
     }
 
     // 全ての単語を取得
-    getWords() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.LEARNED_WORDS) || '[]');
+    async getWords() {
+        try {
+            const snapshot = await db.collection(COLLECTION_NAME)
+                .orderBy('word', 'asc')
+                .get();
+
+            const words = [];
+            snapshot.forEach(doc => {
+                words.push(doc.data().word);
+            });
+
+            return words;
+        } catch (error) {
+            console.error('Error getting words:', error);
+            return [];
+        }
     }
 
     // 統計をリセット（設定ページで使用）
-    resetStats() {
-        localStorage.setItem(STORAGE_KEYS.LEARNED_WORDS, JSON.stringify([]));
-        localStorage.setItem(STORAGE_KEYS.TODAY_COUNT, '0');
+    async resetStats() {
+        try {
+            const snapshot = await db.collection(COLLECTION_NAME).get();
+            const batch = db.batch();
+
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+
+            await batch.commit();
+            return true;
+        } catch (error) {
+            console.error('Error resetting stats:', error);
+            return false;
+        }
     }
 }
 
 // ページ読み込み時の処理
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const statsManager = new StatsManager();
-    updateDisplay(statsManager);
+    await updateDisplay(statsManager);
 });
 
 // 表示を更新
-function updateDisplay(statsManager) {
+async function updateDisplay(statsManager) {
     const totalWordsElement = document.getElementById('totalWords');
     const todayWordsElement = document.getElementById('todayWords');
 
     if (totalWordsElement) {
-        totalWordsElement.textContent = statsManager.getTotalWords();
+        const totalWords = await statsManager.getTotalWords();
+        totalWordsElement.textContent = totalWords;
 
         // アニメーション効果
         totalWordsElement.style.animation = 'countUp 0.5s ease-out';
