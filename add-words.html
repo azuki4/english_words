@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語を追加 - 英単語学習アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 上部：ヘッダー -->
+        <header class="page-header">
+            <a href="settings.html" class="back-button">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>設定に戻る</span>
+            </a>
+            <h1>単語を追加</h1>
+        </header>
+
+        <!-- メインコンテンツエリア -->
+        <main class="main-content add-words-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" id="wordInput" class="word-input" placeholder="英単語を入力してください">
+                    <button id="addBtn" class="btn btn-primary">追加</button>
+                </div>
+                <p class="input-hint">※ 英単語のみ入力してください</p>
+            </div>
+
+            <div class="success-message" id="successMessage" style="display: none;">
+                <p>単語を追加しました！</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/add-words.js"></script>
+</body>
+</html>

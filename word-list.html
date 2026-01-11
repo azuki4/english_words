@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>単語一覧 - 英単語学習アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 上部：ヘッダー -->
+        <header class="page-header">
+            <a href="settings.html" class="back-button">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>設定に戻る</span>
+            </a>
+            <h1>登録済み単語一覧</h1>
+        </header>
+
+        <!-- メインコンテンツエリア -->
+        <main class="main-content word-list-content">
+            <div class="word-count-info">
+                <p>登録単語数: <span id="wordCount">0</span></p>
+            </div>
+
+            <div class="word-list" id="wordList">
+                <!-- JavaScriptで動的に単語を表示 -->
+            </div>
+
+            <div class="empty-message" id="emptyMessage" style="display: none;">
+                <p>まだ単語が登録されていません</p>
+                <a href="add-words.html" class="btn btn-primary">単語を追加する</a>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/word-list.js"></script>
+</body>
+</html>

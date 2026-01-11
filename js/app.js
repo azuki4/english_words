@@ -50,11 +50,16 @@ class StatsManager {
         if (!words.includes(word)) {
             words.push(word);
             localStorage.setItem(STORAGE_KEYS.LEARNED_WORDS, JSON.stringify(words));
-        }
 
-        // 今日のカウントを増やす
-        const todayCount = this.getTodayWords();
-        localStorage.setItem(STORAGE_KEYS.TODAY_COUNT, (todayCount + 1).toString());
+            // 今日のカウントを増やす（新規追加の場合のみ）
+            const todayCount = this.getTodayWords();
+            localStorage.setItem(STORAGE_KEYS.TODAY_COUNT, (todayCount + 1).toString());
+        }
+    }
+
+    // 全ての単語を取得
+    getWords() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.LEARNED_WORDS) || '[]');
     }
 
     // 統計をリセット（設定ページで使用）

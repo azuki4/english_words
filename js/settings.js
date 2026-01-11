@@ -1,20 +1,36 @@
 // 設定ページの機能
 document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.getElementById('resetBtn');
+    const resetConfirm = document.getElementById('resetConfirm');
+    const confirmYes = document.getElementById('confirmYes');
+    const confirmNo = document.getElementById('confirmNo');
 
-    if (resetBtn) {
+    if (resetBtn && resetConfirm && confirmYes && confirmNo) {
+        // リセットボタンをクリック
         resetBtn.addEventListener('click', function() {
             // 確認ダイアログを表示
-            if (confirm('本当に全ての学習データをリセットしますか？\nこの操作は取り消せません。')) {
-                const statsManager = new StatsManager();
-                statsManager.resetStats();
+            resetConfirm.style.display = 'block';
+            resetBtn.style.display = 'none';
+        });
 
-                // 表示を更新
-                updateDisplay(statsManager);
+        // 「はい」ボタンをクリック
+        confirmYes.addEventListener('click', function() {
+            const statsManager = new StatsManager();
+            statsManager.resetStats();
 
-                // フィードバック
-                alert('学習データをリセットしました。');
-            }
+            // 確認ダイアログを非表示
+            resetConfirm.style.display = 'none';
+            resetBtn.style.display = 'flex';
+
+            // メインページに戻る
+            window.location.href = 'index.html';
+        });
+
+        // 「いいえ」ボタンをクリック
+        confirmNo.addEventListener('click', function() {
+            // 確認ダイアログを非表示
+            resetConfirm.style.display = 'none';
+            resetBtn.style.display = 'flex';
         });
     }
 });

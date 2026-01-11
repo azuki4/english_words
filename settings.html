@@ -8,23 +8,31 @@
 </head>
 <body>
     <div class="container">
-        <!-- 上部：統計情報 -->
-        <header class="stats-header">
+        <!-- 上部：ヘッダー -->
+        <header class="settings-header">
             <h1>設定</h1>
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="stat-label">総単語数</div>
-                    <div class="stat-value" id="totalWords">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">今日の学習</div>
-                    <div class="stat-value" id="todayWords">0</div>
-                </div>
-            </div>
         </header>
 
         <!-- メインコンテンツエリア -->
         <main class="main-content settings-content">
+            <div class="settings-section">
+                <h2 class="section-title">単語管理</h2>
+                <div class="settings-list">
+                    <a href="add-words.html" class="settings-item">
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">単語を追加</div>
+                            <div class="settings-item-desc">新しい英単語を登録します</div>
+                        </div>
+                    </a>
+                    <a href="word-list.html" class="settings-item">
+                        <div class="settings-item-content">
+                            <div class="settings-item-title">単語一覧</div>
+                            <div class="settings-item-desc">登録済みの英単語を確認します</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
             <div class="settings-section">
                 <h2 class="section-title">データ管理</h2>
                 <div class="settings-list">
@@ -35,16 +43,12 @@
                         </div>
                     </button>
                 </div>
-            </div>
-
-            <div class="settings-section">
-                <h2 class="section-title">アプリについて</h2>
-                <div class="settings-list">
-                    <div class="settings-item">
-                        <div class="settings-item-content">
-                            <div class="settings-item-title">バージョン</div>
-                            <div class="settings-item-desc">1.0.0</div>
-                        </div>
+                <!-- リセット確認ダイアログ -->
+                <div class="reset-confirm" id="resetConfirm" style="display: none;">
+                    <p class="reset-confirm-message">本当に全ての学習データをリセットしますか？</p>
+                    <div class="reset-confirm-buttons">
+                        <button class="btn btn-danger" id="confirmYes">はい</button>
+                        <button class="btn btn-secondary" id="confirmNo">いいえ</button>
                     </div>
                 </div>
             </div>
@@ -56,7 +60,7 @@
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <span>ホーム</span>
+                <span>メイン</span>
             </a>
             <a href="study.html" class="nav-button study-btn">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
