@@ -45,14 +45,25 @@ class StatsManager {
 
             // Firestoreになければjisho.org APIから取得
             const url = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
+            console.log('APIリクエストURL:', url);
+
             const response = await fetch(url);
+            console.log('レスポンスステータス:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
+            console.log('APIレスポンス:', data);
 
             if (data.data && data.data.length > 0) {
                 const translations = [];
 
                 // 最初のエントリから複数の意味を取得（最大3つ）
                 const senses = data.data[0].senses || [];
+                console.log('取得した意味の数:', senses.length);
+
                 for (let i = 0; i < Math.min(senses.length, 3); i++) {
                     const sense = senses[i];
                     if (sense.english_definitions && sense.english_definitions.length > 0) {
@@ -72,8 +83,10 @@ class StatsManager {
             console.log('翻訳を取得できませんでした');
             return '翻訳なし';
         } catch (error) {
-            console.error('Error getting translation:', error);
-            return '翻訳エラー';
+            console.error('翻訳取得エラーの詳細:', error);
+            console.error('エラーメッセージ:', error.message);
+            console.error('エラースタック:', error.stack);
+            return '翻訳エラー: ' + error.message;
         }
     }
 
