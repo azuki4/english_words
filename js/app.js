@@ -57,6 +57,34 @@ class StatsManager {
             const data = await response.json();
             console.log('APIレスポンス:', data);
 
+            // デバッグ情報を表示
+            if (data._debug) {
+                console.log('=== デバッグ情報 ===');
+                console.log('単語:', data._debug.keyword);
+                console.log('タイムスタンプ:', data._debug.timestamp);
+                console.log('試行回数:', data._debug.attempts.length);
+                data._debug.attempts.forEach((attempt, index) => {
+                    console.log(`試行${index + 1}:`, attempt);
+                });
+                console.log('===================');
+            }
+
+            // エラーレスポンスの場合
+            if (data.error) {
+                console.error('APIエラー:', data.error);
+                console.error('詳細:', data.details);
+                if (data.debug) {
+                    console.error('=== エラーデバッグ情報 ===');
+                    console.error('単語:', data.debug.keyword);
+                    console.error('試行回数:', data.debug.attempts.length);
+                    data.debug.attempts.forEach((attempt, index) => {
+                        console.error(`試行${index + 1}:`, attempt);
+                    });
+                    console.error('=======================');
+                }
+                throw new Error(data.error);
+            }
+
             if (data.data && data.data.length > 0) {
                 // 最初のエントリのみから日本語訳を取得
                 const entry = data.data[0];
