@@ -20,11 +20,62 @@ class StatsManager {
         }
     }
 
-    // 今日学習した単語数を取得
-    getTodayWords() {
-        const today = new Date().toDateString();
-        const studyData = JSON.parse(localStorage.getItem('studyData') || '{}');
-        return studyData[today] || 0;
+    // 今日学習した単語数を取得（Firestoreから共有）
+    async getTodayWords() {
+        try {
+            const today = this.getTodayDateString();
+            const docRef = db.collection('dailyStats').doc(today);
+            const doc = await docRef.get();
+
+            if (doc.exists) {
+                return doc.data().studyCount || 0;
+            }
+            return 0;
+        } catch (error) {
+            console.error('Error getting today words:', error);
+            return 0;
+        }
+    }
+
+    // 今日の日付文字列を取得（YYYY-MM-DD形式）
+    getTodayDateString() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // 今日の学習カウントをインクリメント（Firestoreで共有）
+    async incrementTodayStudy() {
+        try {
+            const today = this.getTodayDateString();
+            const docRef = db.collection('dailyStats').doc(today);
+
+            // トランザクションを使用してカウントをインクリメント
+            await db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(docRef);
+
+                if (doc.exists) {
+                    const newCount = (doc.data().studyCount || 0) + 1;
+                    transaction.update(docRef, {
+                        studyCount: newCount,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    transaction.set(docRef, {
+                        studyCount: 1,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+
+            console.log('今日の学習カウントをインクリメントしました');
+            return true;
+        } catch (error) {
+            console.error('Error incrementing today study:', error);
+            return false;
+        }
     }
 
     // 新しい単語を追加
@@ -68,6 +119,7 @@ class StatsManager {
             snapshot.forEach(doc => {
                 const data = doc.data();
                 words.push({
+                    id: doc.id,  // ドキュメントIDを追加
                     word: data.word,
                     translations: data.translations || []
                 });
@@ -81,6 +133,43 @@ class StatsManager {
             console.error('Error getting words:', error);
             alert('エラー: ' + error.message);
             return [];
+        }
+    }
+
+    // 単語を更新
+    async updateWord(docId, word, translations) {
+        try {
+            console.log('単語を更新中:', docId, word);
+            console.log('翻訳:', translations);
+
+            await db.collection(COLLECTION_NAME).doc(docId).update({
+                word: word,
+                translations: translations,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log('単語を更新しました');
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating word:', error);
+            alert('エラー: ' + error.message);
+            return { success: false };
+        }
+    }
+
+    // 単語を削除
+    async deleteWord(docId) {
+        try {
+            console.log('単語を削除中:', docId);
+
+            await db.collection(COLLECTION_NAME).doc(docId).delete();
+
+            console.log('単語を削除しました');
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting word:', error);
+            alert('エラー: ' + error.message);
+            return { success: false };
         }
     }
 
@@ -123,7 +212,8 @@ async function updateDisplay(statsManager) {
     }
 
     if (todayWordsElement) {
-        todayWordsElement.textContent = statsManager.getTodayWords();
+        const todayWords = await statsManager.getTodayWords();
+        todayWordsElement.textContent = todayWords;
 
         // アニメーション効果
         todayWordsElement.style.animation = 'countUp 0.5s ease-out';

@@ -33,6 +33,33 @@
                 <a href="add-words.html" class="btn btn-primary">単語を追加する</a>
             </div>
         </main>
+
+        <!-- 編集モーダル -->
+        <div id="editModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>単語を編集</h2>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">英単語 <span class="required">※必須</span></label>
+                        <input type="text" id="editWord" class="form-input" placeholder="例: run">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">日本語訳 <span class="required">※必須（最低1つ）</span></label>
+                        <div id="editTranslationsContainer">
+                            <!-- 翻訳入力欄は動的に追加 -->
+                        </div>
+                        <button id="addEditTranslationBtn" class="btn btn-secondary add-translation-btn">+ 日本語訳を追加</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelEditBtn" class="btn btn-secondary">キャンセル</button>
+                    <button id="saveEditBtn" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Firebase SDK -->

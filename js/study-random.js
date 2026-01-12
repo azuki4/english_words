@@ -84,28 +84,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // 4段階評価を処理
-    function handleRating(rating) {
+    async function handleRating(rating) {
         console.log(`評価: ${rating}, 単語: ${currentWord.word}`);
 
-        // 今日の学習カウントをインクリメント
-        incrementTodayStudy();
+        // 今日の学習カウントをインクリメント（Firestore使用）
+        const statsManager = new StatsManager();
+        await statsManager.incrementTodayStudy();
 
         // 次の単語を表示
         showRandomWord();
-    }
-
-    // 今日の学習カウントをインクリメント
-    function incrementTodayStudy() {
-        const today = new Date().toDateString();
-        let studyData = JSON.parse(localStorage.getItem('studyData') || '{}');
-
-        if (!studyData[today]) {
-            studyData[today] = 0;
-        }
-
-        studyData[today]++;
-        localStorage.setItem('studyData', JSON.stringify(studyData));
-
-        console.log(`今日の学習: ${studyData[today]}`);
     }
 });
