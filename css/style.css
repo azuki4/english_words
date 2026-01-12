@@ -412,12 +412,30 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 3rem;
+    padding-top: 2rem;
 }
 
 .input-section {
     width: 100%;
     max-width: 400px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: #667eea;
+    font-size: 0.8rem;
+    font-weight: 400;
 }
 
 .input-group {
@@ -427,7 +445,7 @@ body {
 }
 
 .word-input {
-    flex: 1;
+    width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid #e0e0e0;
     border-radius: 8px;
@@ -438,6 +456,56 @@ body {
 .word-input:focus {
     outline: none;
     border-color: #667eea;
+}
+
+.translation-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.translation-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.translation-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.remove-translation-btn {
+    padding: 0.5rem;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    min-width: 60px;
+    transition: background 0.3s ease;
+}
+
+.remove-translation-btn:hover {
+    background: #c0392b;
+}
+
+.add-translation-btn {
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .input-hint {

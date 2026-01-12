@@ -21,11 +21,22 @@
         <!-- メインコンテンツエリア -->
         <main class="main-content add-words-content">
             <div class="input-section">
-                <div class="input-group">
-                    <input type="text" id="wordInput" class="word-input" placeholder="英単語を入力してください">
-                    <button id="addBtn" class="btn btn-primary">追加</button>
+                <div class="form-group">
+                    <label for="wordInput" class="form-label">英単語</label>
+                    <input type="text" id="wordInput" class="word-input" placeholder="例: run">
                 </div>
-                <p class="input-hint">※ 英単語のみ入力してください</p>
+
+                <div class="form-group">
+                    <label class="form-label">日本語訳 <span class="required">※必須（最低1つ）</span></label>
+                    <div id="translationsContainer">
+                        <div class="translation-input-group">
+                            <input type="text" class="translation-input" placeholder="例: 走る" data-index="0">
+                        </div>
+                    </div>
+                    <button id="addTranslationBtn" class="btn btn-secondary add-translation-btn">+ 日本語訳を追加</button>
+                </div>
+
+                <button id="submitBtn" class="btn btn-primary submit-btn">登録</button>
             </div>
 
             <div class="success-message" id="successMessage" style="display: none;">

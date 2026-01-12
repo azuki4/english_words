@@ -25,95 +25,11 @@ class StatsManager {
         return 0;
     }
 
-    // jisho.org APIを使って翻訳を取得
-    async getTranslation(word) {
-        try {
-            console.log('翻訳を取得中:', word);
-
-            // まずFirestoreから翻訳を検索
-            const querySnapshot = await db.collection(COLLECTION_NAME)
-                .where('word', '==', word)
-                .get();
-
-            if (!querySnapshot.empty) {
-                const data = querySnapshot.docs[0].data();
-                if (data.translation) {
-                    console.log('Firestoreから翻訳を取得:', data.translation);
-                    return data.translation;
-                }
-            }
-
-            // Firestoreになければjisho.org APIから取得（Cloudflare Workers経由）
-            const proxyUrl = `https://english-words.azukibaka090.workers.dev/?keyword=${encodeURIComponent(word)}`;
-            console.log('APIリクエストURL（Cloudflare Workers経由）:', proxyUrl);
-
-            const response = await fetch(proxyUrl);
-            console.log('レスポンスステータス:', response.status);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('APIレスポンス:', data);
-
-            // デバッグ情報を表示
-            if (data._debug) {
-                console.log('=== デバッグ情報 ===');
-                console.log('単語:', data._debug.keyword);
-                console.log('タイムスタンプ:', data._debug.timestamp);
-                console.log('試行回数:', data._debug.attempts.length);
-                data._debug.attempts.forEach((attempt, index) => {
-                    console.log(`試行${index + 1}:`, attempt);
-                });
-                console.log('===================');
-            }
-
-            // エラーレスポンスの場合
-            if (data.error) {
-                console.error('APIエラー:', data.error);
-                console.error('詳細:', data.details);
-                if (data.debug) {
-                    console.error('=== エラーデバッグ情報 ===');
-                    console.error('単語:', data.debug.keyword);
-                    console.error('試行回数:', data.debug.attempts.length);
-                    data.debug.attempts.forEach((attempt, index) => {
-                        console.error(`試行${index + 1}:`, attempt);
-                    });
-                    console.error('=======================');
-                }
-                throw new Error(data.error);
-            }
-
-            if (data.data && data.data.length > 0) {
-                // 最初のエントリのみから日本語訳を取得
-                const entry = data.data[0];
-
-                if (entry.japanese && entry.japanese.length > 0) {
-                    // 最初の日本語表記を取得（wordまたはreading）
-                    const firstJapanese = entry.japanese[0];
-                    const translation = firstJapanese.word || firstJapanese.reading || '翻訳なし';
-
-                    console.log('取得した翻訳:', translation);
-                    console.log('jisho.org APIから翻訳を取得:', translation);
-                    return translation;
-                }
-            }
-
-            console.log('翻訳を取得できませんでした');
-            return '翻訳なし';
-        } catch (error) {
-            console.error('翻訳取得エラーの詳細:', error);
-            console.error('エラーメッセージ:', error.message);
-            console.error('エラースタック:', error.stack);
-            return '翻訳エラー: ' + error.message;
-        }
-    }
-
     // 新しい単語を追加
-    async addWord(word) {
+    async addWord(word, translations) {
         try {
             console.log('単語を追加中:', word);
+            console.log('翻訳:', translations);
 
             // 既に存在するか確認
             const querySnapshot = await db.collection(COLLECTION_NAME)
@@ -124,23 +40,20 @@ class StatsManager {
 
             // 存在しない場合のみ追加
             if (querySnapshot.empty) {
-                // 翻訳を取得
-                const translation = await this.getTranslation(word);
-
                 const docRef = await db.collection(COLLECTION_NAME).add({
                     word: word,
-                    translation: translation,
+                    translations: translations,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 console.log('単語を追加しました。ID:', docRef.id);
-                return { success: true, translation: translation };
+                return { success: true };
             }
             console.log('単語は既に存在します');
-            return { success: false, translation: null };
+            return { success: false };
         } catch (error) {
             console.error('Error adding word:', error);
             alert('エラー: ' + error.message);
-            return { success: false, translation: null };
+            return { success: false };
         }
     }
 
@@ -154,7 +67,7 @@ class StatsManager {
                 const data = doc.data();
                 words.push({
                     word: data.word,
-                    translation: data.translation || '翻訳なし'
+                    translations: data.translations || []
                 });
             });
 
