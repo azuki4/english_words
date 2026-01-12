@@ -43,10 +43,9 @@ class StatsManager {
                 }
             }
 
-            // Firestoreになければjisho.org APIから取得（CORSプロキシ経由）
-            const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(jishoUrl)}`;
-            console.log('APIリクエストURL（プロキシ経由）:', proxyUrl);
+            // Firestoreになければjisho.org APIから取得（Cloudflare Workers経由）
+            const proxyUrl = `https://english-words.azukibaka090.workers.dev/?keyword=${encodeURIComponent(word)}`;
+            console.log('APIリクエストURL（Cloudflare Workers経由）:', proxyUrl);
 
             const response = await fetch(proxyUrl);
             console.log('レスポンスステータス:', response.status);
@@ -55,20 +54,8 @@ class StatsManager {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const proxyData = await response.json();
-            console.log('プロキシレスポンス:', proxyData);
-            console.log('contentsフィールド:', proxyData.contents);
-
-            // allorigins.winはcontentsフィールドにレスポンスを格納
-            let data;
-            try {
-                data = JSON.parse(proxyData.contents);
-                console.log('APIレスポンス:', data);
-            } catch (parseError) {
-                console.error('JSON parse エラー:', parseError);
-                console.error('パースしようとした内容:', proxyData.contents);
-                throw new Error('JSON parse failed: ' + parseError.message);
-            }
+            const data = await response.json();
+            console.log('APIレスポンス:', data);
 
             if (data.data && data.data.length > 0) {
                 const translations = [];
