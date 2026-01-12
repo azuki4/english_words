@@ -58,30 +58,15 @@ class StatsManager {
             console.log('APIレスポンス:', data);
 
             if (data.data && data.data.length > 0) {
-                const translations = [];
+                // 最初のエントリのみから日本語訳を取得
+                const entry = data.data[0];
 
-                // 各エントリから日本語訳を取得（最大5エントリ）
-                for (let i = 0; i < Math.min(data.data.length, 5); i++) {
-                    const entry = data.data[i];
+                if (entry.japanese && entry.japanese.length > 0) {
+                    // 最初の日本語表記を取得（wordまたはreading）
+                    const firstJapanese = entry.japanese[0];
+                    const translation = firstJapanese.word || firstJapanese.reading || '翻訳なし';
 
-                    // japaneseフィールドから日本語訳を取得
-                    if (entry.japanese && entry.japanese.length > 0) {
-                        const japaneseWords = entry.japanese
-                            .slice(0, 2)  // 最初の2つの日本語表記
-                            .map(j => j.word || j.reading)  // wordがなければreadingを使用
-                            .filter(w => w)  // 空でないものだけ
-                            .join('、');
-
-                        if (japaneseWords) {
-                            translations.push(japaneseWords);
-                        }
-                    }
-                }
-
-                console.log('取得した翻訳:', translations);
-
-                if (translations.length > 0) {
-                    const translation = translations.join(' / ');
+                    console.log('取得した翻訳:', translation);
                     console.log('jisho.org APIから翻訳を取得:', translation);
                     return translation;
                 }
