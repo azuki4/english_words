@@ -65,18 +65,25 @@ class StatsManager {
             if (data.data && data.data.length > 0) {
                 const translations = [];
 
-                // 最初のエントリから複数の意味を取得（最大3つ）
-                const senses = data.data[0].senses || [];
-                console.log('取得した意味の数:', senses.length);
+                // 各エントリから日本語訳を取得（最大5エントリ）
+                for (let i = 0; i < Math.min(data.data.length, 5); i++) {
+                    const entry = data.data[i];
 
-                for (let i = 0; i < Math.min(senses.length, 3); i++) {
-                    const sense = senses[i];
-                    if (sense.english_definitions && sense.english_definitions.length > 0) {
-                        // 各意味の最初の2つの定義を取得
-                        const definitions = sense.english_definitions.slice(0, 2).join('、');
-                        translations.push(definitions);
+                    // japaneseフィールドから日本語訳を取得
+                    if (entry.japanese && entry.japanese.length > 0) {
+                        const japaneseWords = entry.japanese
+                            .slice(0, 2)  // 最初の2つの日本語表記
+                            .map(j => j.word || j.reading)  // wordがなければreadingを使用
+                            .filter(w => w)  // 空でないものだけ
+                            .join('、');
+
+                        if (japaneseWords) {
+                            translations.push(japaneseWords);
+                        }
                     }
                 }
+
+                console.log('取得した翻訳:', translations);
 
                 if (translations.length > 0) {
                     const translation = translations.join(' / ');
