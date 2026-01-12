@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const translationText = document.createElement('div');
             translationText.className = 'translation-text';
-            translationText.textContent = wordData.translation;
+            // 複数の翻訳を " / " で区切って表示
+            const translationsStr = wordData.translations && wordData.translations.length > 0
+                ? wordData.translations.join(' / ')
+                : '翻訳なし';
+            translationText.textContent = translationsStr;
 
             wordItem.appendChild(wordText);
             wordItem.appendChild(translationText);
