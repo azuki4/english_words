@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     let allWords = [];
     let currentWord = null;
 
+    // 日次減衰処理を実行（ページ読み込み時に1回のみ）
+    const statsManager = new StatsManager();
+    await statsManager.applyDailyMemoryDecay();
+
     // 単語を読み込み
     await loadWords();
 
@@ -87,9 +91,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function handleRating(rating) {
         console.log(`評価: ${rating}, 単語: ${currentWord.word}`);
 
-        // 今日の学習カウントをインクリメント（Firestore使用）
         const statsManager = new StatsManager();
+
+        // 記憶度を更新
+        await statsManager.updateMemoryScore(currentWord.id, rating);
+
+        // 今日の学習カウントをインクリメント（Firestore使用）
         await statsManager.incrementTodayStudy();
+
+        // 単語リストを再読み込み（記憶度が更新されたため）
+        await loadWords();
 
         // 次の単語を表示
         showRandomWord();

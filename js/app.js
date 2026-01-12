@@ -130,6 +130,8 @@ class StatsManager {
                 const docRef = await db.collection(COLLECTION_NAME).add({
                     word: word,
                     translations: translations,
+                    memoryScore: 50.0,  // 初期記憶度
+                    lastStudiedDate: null,  // 最後に学習した日付（初期はnull）
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 console.log('単語を追加しました。ID:', docRef.id);
@@ -155,7 +157,9 @@ class StatsManager {
                 words.push({
                     id: doc.id,  // ドキュメントIDを追加
                     word: data.word,
-                    translations: data.translations || []
+                    translations: data.translations || [],
+                    memoryScore: data.memoryScore !== undefined ? data.memoryScore : 50.0,
+                    lastStudiedDate: data.lastStudiedDate || null
                 });
             });
 
@@ -205,6 +209,164 @@ class StatsManager {
             alert('エラー: ' + error.message);
             return { success: false };
         }
+    }
+
+    // 単語の記憶度を更新（4段階評価ボタン押下時）
+    // rating: 1=全くわからない, 2=少しわかる, 3=だいたいわかる, 4=完璧にわかる
+    async updateMemoryScore(docId, rating) {
+        try {
+            const today = this.getTodayDateString();
+            const docRef = db.collection(COLLECTION_NAME).doc(docId);
+
+            await db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(docRef);
+
+                if (!doc.exists) {
+                    throw new Error('単語が存在しません');
+                }
+
+                const data = doc.data();
+                const currentScore = data.memoryScore !== undefined ? data.memoryScore : 50.0;
+                const lastStudiedDate = data.lastStudiedDate;
+
+                let scoreChange = 0;
+
+                // 最後に学習した日付が今日と異なる場合、または初回学習の場合
+                if (lastStudiedDate !== today) {
+                    // 通常の変動
+                    if (rating === 1) scoreChange = -25;
+                    else if (rating === 2) scoreChange = -12.5;
+                    else if (rating === 3) scoreChange = 12.5;
+                    else if (rating === 4) scoreChange = 25;
+                } else {
+                    // 最後に学習した日付が今日と同じ場合
+                    if (currentScore < 50) {
+                        // 記憶度50未満の場合は通常の変動
+                        if (rating === 1) scoreChange = -25;
+                        else if (rating === 2) scoreChange = -12.5;
+                        else if (rating === 3) scoreChange = 12.5;
+                        else if (rating === 4) scoreChange = 25;
+                    } else {
+                        // 記憶度50以上の場合は増加が小さい
+                        if (rating === 1) scoreChange = -25;
+                        else if (rating === 2) scoreChange = -12.5;
+                        else if (rating === 3) scoreChange = 1.25;
+                        else if (rating === 4) scoreChange = 2.5;
+                    }
+                }
+
+                // 新しい記憶度を計算（0~100の範囲に制限）
+                let newScore = currentScore + scoreChange;
+                newScore = Math.max(0, Math.min(100, newScore));
+
+                // 更新
+                transaction.update(docRef, {
+                    memoryScore: newScore,
+                    lastStudiedDate: today,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                console.log(`記憶度更新: ${currentScore} -> ${newScore} (変動: ${scoreChange})`);
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error updating memory score:', error);
+            return { success: false };
+        }
+    }
+
+    // 日次の記憶度減衰処理（日付変更時に1回のみ実行）
+    async applyDailyMemoryDecay() {
+        try {
+            const today = this.getTodayDateString();
+
+            // 日次処理が実行されたかチェック
+            const dailyProcessRef = db.collection('systemConfig').doc('dailyProcess');
+
+            // トランザクションで排他制御
+            const needsProcessing = await db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(dailyProcessRef);
+
+                if (doc.exists && doc.data().lastProcessedDate === today) {
+                    // 今日すでに処理済み
+                    return false;
+                }
+
+                // 処理済みとしてマーク
+                transaction.set(dailyProcessRef, {
+                    lastProcessedDate: today,
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                return true;
+            });
+
+            if (!needsProcessing) {
+                console.log('日次処理は既に実行済みです');
+                return { success: true, processed: false };
+            }
+
+            // 全単語を取得
+            const snapshot = await db.collection(COLLECTION_NAME).get();
+            const batch = db.batch();
+            let processedCount = 0;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const currentScore = data.memoryScore !== undefined ? data.memoryScore : 50.0;
+                let lastStudiedDate = data.lastStudiedDate;
+
+                // lastStudiedDateがnullの場合は登録日（createdAt）を参照
+                if (!lastStudiedDate && data.createdAt) {
+                    const createdAtDate = data.createdAt.toDate();
+                    const jstCreatedDate = new Date(createdAtDate.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+                    const year = jstCreatedDate.getFullYear();
+                    const month = String(jstCreatedDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(jstCreatedDate.getDate()).padStart(2, '0');
+                    lastStudiedDate = `${year}-${month}-${day}`;
+                }
+
+                // 基準日付が存在し、今日と異なる場合のみ減衰処理
+                if (lastStudiedDate && lastStudiedDate !== today) {
+                    let newScore;
+
+                    if (currentScore < 80) {
+                        // 記憶度が80未満の場合: x(n+4)/(n+5)
+                        const daysDiff = this.getDaysDifference(lastStudiedDate, today);
+                        newScore = currentScore * (daysDiff + 4) / (daysDiff + 5);
+                    } else {
+                        // 記憶度が80以上の場合: -1
+                        newScore = currentScore - 1;
+                    }
+
+                    // 0~100の範囲に制限
+                    newScore = Math.max(0, Math.min(100, newScore));
+
+                    batch.update(doc.ref, { memoryScore: newScore });
+                    processedCount++;
+                }
+            });
+
+            if (processedCount > 0) {
+                await batch.commit();
+                console.log(`日次減衰処理完了: ${processedCount}件の単語を処理`);
+            }
+
+            return { success: true, processed: true, count: processedCount };
+        } catch (error) {
+            console.error('Error applying daily memory decay:', error);
+            return { success: false };
+        }
+    }
+
+    // 2つの日付文字列（YYYY-MM-DD形式）の差分日数を計算
+    getDaysDifference(dateStr1, dateStr2) {
+        const date1 = new Date(dateStr1);
+        const date2 = new Date(dateStr2);
+        const diffTime = Math.abs(date2 - date1);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
     }
 
     // 統計をリセット（設定ページで使用）
