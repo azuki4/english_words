@@ -369,6 +369,47 @@ class StatsManager {
         return diffDays;
     }
 
+    // 既存の単語データに記憶度フィールドを追加（データ移行）
+    async migrateWordData() {
+        try {
+            const snapshot = await db.collection(COLLECTION_NAME).get();
+            const batch = db.batch();
+            let migratedCount = 0;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+
+                // memoryScoreまたはlastStudiedDateが存在しない場合のみ更新
+                if (data.memoryScore === undefined || data.lastStudiedDate === undefined) {
+                    const updates = {};
+
+                    if (data.memoryScore === undefined) {
+                        updates.memoryScore = 50.0;
+                    }
+
+                    if (data.lastStudiedDate === undefined) {
+                        updates.lastStudiedDate = null;
+                    }
+
+                    batch.update(doc.ref, updates);
+                    migratedCount++;
+                }
+            });
+
+            if (migratedCount > 0) {
+                await batch.commit();
+                console.log(`データ移行完了: ${migratedCount}件の単語を更新`);
+            } else {
+                console.log('データ移行: 更新が必要な単語はありません');
+            }
+
+            return { success: true, count: migratedCount };
+        } catch (error) {
+            console.error('Error migrating word data:', error);
+            return { success: false };
+        }
+    }
+
     // 統計をリセット（設定ページで使用）
     async resetStats() {
         try {

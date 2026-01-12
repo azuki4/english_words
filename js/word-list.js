@@ -1,5 +1,5 @@
 // 単語一覧ページの機能
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const wordList = document.getElementById('wordList');
     const wordCount = document.getElementById('wordCount');
     const emptyMessage = document.getElementById('emptyMessage');
@@ -17,11 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let editTranslationCount = 0;
 
     if (wordList && wordCount && emptyMessage) {
-        displayWords();
+        // データ移行処理を実行（既存データに記憶度フィールドを追加）
+        const statsManager = new StatsManager();
+        await statsManager.migrateWordData();
+
+        await displayWords();
 
         // Firestoreのリアルタイム更新を監視
-        db.collection('words').onSnapshot(function() {
-            displayWords();
+        db.collection('words').onSnapshot(async function() {
+            await displayWords();
         });
     }
 

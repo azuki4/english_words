@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     const emptyMessage = document.getElementById('emptyMessage');
 
     if (wordStatsList && wordCount && emptyMessage) {
+        // データ移行処理を実行（既存データに記憶度フィールドを追加）
+        const statsManager = new StatsManager();
+        await statsManager.migrateWordData();
+
         await displayWordStats();
 
         // Firestoreのリアルタイム更新を監視
@@ -14,11 +18,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     async function displayWordStats() {
-        const statsManager = new StatsManager();
-        const words = await statsManager.getWords();
+        try {
+            const statsManager = new StatsManager();
+            const words = await statsManager.getWords();
 
-        // 単語数を表示
-        wordCount.textContent = words.length;
+            console.log('取得した単語数:', words.length);
+            console.log('単語データ:', words);
+
+            // 単語数を表示
+            wordCount.textContent = words.length;
 
         // 単語がない場合
         if (words.length === 0) {
@@ -114,5 +122,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             statsItem.appendChild(statsData);
             wordStatsList.appendChild(statsItem);
         });
+        } catch (error) {
+            console.error('Error displaying word stats:', error);
+            wordCount.textContent = 'エラー';
+        }
     }
 });
