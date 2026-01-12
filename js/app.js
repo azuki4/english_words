@@ -25,7 +25,7 @@ class StatsManager {
         return 0;
     }
 
-    // MyMemory APIを使って翻訳を取得
+    // jisho.org APIを使って翻訳を取得
     async getTranslation(word) {
         try {
             console.log('翻訳を取得中:', word);
@@ -43,15 +43,30 @@ class StatsManager {
                 }
             }
 
-            // FirestoreになければAPIから取得
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ja`;
+            // Firestoreになければjisho.org APIから取得
+            const url = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
             const response = await fetch(url);
             const data = await response.json();
 
-            if (data.responseStatus === 200 && data.responseData) {
-                const translation = data.responseData.translatedText;
-                console.log('APIから翻訳を取得:', translation);
-                return translation;
+            if (data.data && data.data.length > 0) {
+                const translations = [];
+
+                // 最初のエントリから複数の意味を取得（最大3つ）
+                const senses = data.data[0].senses || [];
+                for (let i = 0; i < Math.min(senses.length, 3); i++) {
+                    const sense = senses[i];
+                    if (sense.english_definitions && sense.english_definitions.length > 0) {
+                        // 各意味の最初の2つの定義を取得
+                        const definitions = sense.english_definitions.slice(0, 2).join('、');
+                        translations.push(definitions);
+                    }
+                }
+
+                if (translations.length > 0) {
+                    const translation = translations.join(' / ');
+                    console.log('jisho.org APIから翻訳を取得:', translation);
+                    return translation;
+                }
             }
 
             console.log('翻訳を取得できませんでした');
