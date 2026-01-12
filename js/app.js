@@ -43,11 +43,12 @@ class StatsManager {
                 }
             }
 
-            // Firestoreになければjisho.org APIから取得
-            const url = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
-            console.log('APIリクエストURL:', url);
+            // Firestoreになければjisho.org APIから取得（CORSプロキシ経由）
+            const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(jishoUrl)}`;
+            console.log('APIリクエストURL（プロキシ経由）:', proxyUrl);
 
-            const response = await fetch(url);
+            const response = await fetch(proxyUrl);
             console.log('レスポンスステータス:', response.status);
 
             if (!response.ok) {
