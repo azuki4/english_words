@@ -32,17 +32,18 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // StatsManagerを使って単語を追加
                 const statsManager = new StatsManager();
-                const added = await statsManager.addWord(word);
+                const result = await statsManager.addWord(word);
 
                 // 入力欄をクリア
                 wordInput.value = '';
 
-                if (added) {
-                    // 成功メッセージを表示
+                if (result.success) {
+                    // 成功メッセージに翻訳を表示
+                    successMessage.innerHTML = `<strong>${word}</strong><br><span style="color: #667eea;">${result.translation}</span>`;
                     successMessage.style.display = 'block';
                     setTimeout(function() {
                         successMessage.style.display = 'none';
-                    }, 2000);
+                    }, 3000);
                 } else {
                     // 既に存在する場合
                     alert('この単語は既に登録されています');

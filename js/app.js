@@ -25,6 +25,43 @@ class StatsManager {
         return 0;
     }
 
+    // MyMemory APIを使って翻訳を取得
+    async getTranslation(word) {
+        try {
+            console.log('翻訳を取得中:', word);
+
+            // まずFirestoreから翻訳を検索
+            const querySnapshot = await db.collection(COLLECTION_NAME)
+                .where('word', '==', word)
+                .get();
+
+            if (!querySnapshot.empty) {
+                const data = querySnapshot.docs[0].data();
+                if (data.translation) {
+                    console.log('Firestoreから翻訳を取得:', data.translation);
+                    return data.translation;
+                }
+            }
+
+            // FirestoreになければAPIから取得
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ja`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.responseStatus === 200 && data.responseData) {
+                const translation = data.responseData.translatedText;
+                console.log('APIから翻訳を取得:', translation);
+                return translation;
+            }
+
+            console.log('翻訳を取得できませんでした');
+            return '翻訳なし';
+        } catch (error) {
+            console.error('Error getting translation:', error);
+            return '翻訳エラー';
+        }
+    }
+
     // 新しい単語を追加
     async addWord(word) {
         try {
@@ -39,19 +76,23 @@ class StatsManager {
 
             // 存在しない場合のみ追加
             if (querySnapshot.empty) {
+                // 翻訳を取得
+                const translation = await this.getTranslation(word);
+
                 const docRef = await db.collection(COLLECTION_NAME).add({
                     word: word,
+                    translation: translation,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 console.log('単語を追加しました。ID:', docRef.id);
-                return true;
+                return { success: true, translation: translation };
             }
             console.log('単語は既に存在します');
-            return false;
+            return { success: false, translation: null };
         } catch (error) {
             console.error('Error adding word:', error);
             alert('エラー: ' + error.message);
-            return false;
+            return { success: false, translation: null };
         }
     }
 
@@ -62,11 +103,15 @@ class StatsManager {
 
             const words = [];
             snapshot.forEach(doc => {
-                words.push(doc.data().word);
+                const data = doc.data();
+                words.push({
+                    word: data.word,
+                    translation: data.translation || '翻訳なし'
+                });
             });
 
             // クライアント側でアルファベット順にソート
-            words.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            words.sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
 
             return words;
         } catch (error) {

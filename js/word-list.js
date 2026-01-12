@@ -33,10 +33,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 単語を表示（既にアルファベット順にソート済み）
         wordList.innerHTML = '';
-        words.forEach(function(word) {
+        words.forEach(function(wordData) {
             const wordItem = document.createElement('div');
             wordItem.className = 'word-item';
-            wordItem.textContent = word;
+
+            const wordText = document.createElement('div');
+            wordText.className = 'word-text';
+            wordText.textContent = wordData.word;
+
+            const translationText = document.createElement('div');
+            translationText.className = 'translation-text';
+            translationText.textContent = wordData.translation;
+
+            wordItem.appendChild(wordText);
+            wordItem.appendChild(translationText);
             wordList.appendChild(wordItem);
         });
     }
