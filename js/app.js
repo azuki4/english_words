@@ -57,10 +57,18 @@ class StatsManager {
 
             const proxyData = await response.json();
             console.log('プロキシレスポンス:', proxyData);
+            console.log('contentsフィールド:', proxyData.contents);
 
             // allorigins.winはcontentsフィールドにレスポンスを格納
-            const data = JSON.parse(proxyData.contents);
-            console.log('APIレスポンス:', data);
+            let data;
+            try {
+                data = JSON.parse(proxyData.contents);
+                console.log('APIレスポンス:', data);
+            } catch (parseError) {
+                console.error('JSON parse エラー:', parseError);
+                console.error('パースしようとした内容:', proxyData.contents);
+                throw new Error('JSON parse failed: ' + parseError.message);
+            }
 
             if (data.data && data.data.length > 0) {
                 const translations = [];
