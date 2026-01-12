@@ -37,16 +37,18 @@ class StatsManager {
         }
     }
 
-    // 今日の日付文字列を取得（YYYY-MM-DD形式）
+    // 今日の日付文字列を取得（YYYY-MM-DD形式、日本時間）
     getTodayDateString() {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
+        // 日本時間（JST, UTC+9）で日付を取得
+        const jstDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+        const year = jstDate.getFullYear();
+        const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+        const day = String(jstDate.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
 
     // 今日の学習カウントをインクリメント（Firestoreで共有）
+    // データ構造: dailyStats/{YYYY-MM-DD} = { studyCount, lastUpdated }
     async incrementTodayStudy() {
         try {
             const today = this.getTodayDateString();
@@ -63,8 +65,10 @@ class StatsManager {
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } else {
+                    // 新しい日付の場合、カウントは1から始まる
                     transaction.set(docRef, {
                         studyCount: 1,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -75,6 +79,36 @@ class StatsManager {
         } catch (error) {
             console.error('Error incrementing today study:', error);
             return false;
+        }
+    }
+
+    // 過去の学習データを取得（将来の実装用）
+    async getStudyHistory(startDate, endDate) {
+        try {
+            let query = db.collection('dailyStats');
+
+            if (startDate) {
+                query = query.where(firebase.firestore.FieldPath.documentId(), '>=', startDate);
+            }
+            if (endDate) {
+                query = query.where(firebase.firestore.FieldPath.documentId(), '<=', endDate);
+            }
+
+            const snapshot = await query.orderBy(firebase.firestore.FieldPath.documentId(), 'desc').get();
+
+            const history = [];
+            snapshot.forEach(doc => {
+                history.push({
+                    date: doc.id,
+                    studyCount: doc.data().studyCount || 0,
+                    lastUpdated: doc.data().lastUpdated
+                });
+            });
+
+            return history;
+        } catch (error) {
+            console.error('Error getting study history:', error);
+            return [];
         }
     }
 
