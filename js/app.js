@@ -45,7 +45,7 @@ class StatsManager {
 
             // Firestoreになければjisho.org APIから取得（CORSプロキシ経由）
             const jishoUrl = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(word)}`;
-            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(jishoUrl)}`;
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(jishoUrl)}`;
             console.log('APIリクエストURL（プロキシ経由）:', proxyUrl);
 
             const response = await fetch(proxyUrl);
@@ -55,7 +55,11 @@ class StatsManager {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
+            const proxyData = await response.json();
+            console.log('プロキシレスポンス:', proxyData);
+
+            // allorigins.winはcontentsフィールドにレスポンスを格納
+            const data = JSON.parse(proxyData.contents);
             console.log('APIレスポンス:', data);
 
             if (data.data && data.data.length > 0) {
