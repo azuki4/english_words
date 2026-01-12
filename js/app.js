@@ -20,9 +20,11 @@ class StatsManager {
         }
     }
 
-    // 今日学習した単語数を取得（未実装のため暫定的に0を返す）
+    // 今日学習した単語数を取得
     getTodayWords() {
-        return 0;
+        const today = new Date().toDateString();
+        const studyData = JSON.parse(localStorage.getItem('studyData') || '{}');
+        return studyData[today] || 0;
     }
 
     // 新しい単語を追加
