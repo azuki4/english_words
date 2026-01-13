@@ -19,10 +19,38 @@
         </header>
 
         <!-- メインコンテンツエリア -->
-        <main class="main-content study-content">
-            <div class="study-placeholder">
-                <p>今後実装予定</p>
-                <p class="sub-text">苦手な単語を重点的に学習できる機能を追加予定です</p>
+        <main class="main-content study-card-content">
+            <div class="study-card">
+                <div class="word-display" id="wordDisplay">読み込み中...</div>
+                <div class="translation-display" id="translationDisplay" style="display: none;"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="showTranslationBtn" class="btn btn-primary action-btn">日本語訳を表示</button>
+
+                <div id="ratingButtons" class="rating-buttons" style="display: none;">
+                    <button class="rating-btn rating-1" data-rating="1">
+                        <span class="rating-label">全く分からない</span>
+                        <span class="rating-icon">😰</span>
+                    </button>
+                    <button class="rating-btn rating-2" data-rating="2">
+                        <span class="rating-label">少し分かる</span>
+                        <span class="rating-icon">🤔</span>
+                    </button>
+                    <button class="rating-btn rating-3" data-rating="3">
+                        <span class="rating-label">だいたい分かる</span>
+                        <span class="rating-icon">😊</span>
+                    </button>
+                    <button class="rating-btn rating-4" data-rating="4">
+                        <span class="rating-label">完璧に分かる</span>
+                        <span class="rating-icon">🎉</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="empty-message" id="emptyMessage" style="display: none;">
+                <p>登録されている単語がありません</p>
+                <a href="add-words.html" class="btn btn-primary" style="margin-top: 1rem;">単語を追加する</a>
             </div>
         </main>
     </div>
@@ -36,5 +64,6 @@
 
     <!-- アプリのスクリプト -->
     <script src="js/app.js"></script>
+    <script src="js/study-weak.js"></script>
 </body>
 </html>
