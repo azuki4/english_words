@@ -1,5 +1,5 @@
 // Cloudflare Worker: jisho.org API Proxy
-// このスクリプトをCloudflare Workersにデプロイしてください
+// このスクリプトをCloudflare Workersにデプロイしてくださ
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
