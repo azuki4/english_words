@@ -1038,3 +1038,138 @@ body {
         justify-content: space-around;
     }
 }
+
+/* テストモードバナー */
+.test-mode-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    animation: pulse-banner 2s ease-in-out infinite;
+}
+
+.test-mode-icon {
+    font-size: 1.2rem;
+}
+
+.test-mode-text {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+@keyframes pulse-banner {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.85;
+    }
+}
+
+/* トグルスイッチ */
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.toggle-slider:hover {
+    opacity: 0.9;
+}
+
+/* テストモード通知 */
+.test-mode-notice {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(238, 90, 111, 0.1) 100%);
+    border-left: 4px solid #ff6b6b;
+    border-radius: 8px;
+}
+
+.notice-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.notice-content {
+    flex: 1;
+}
+
+.notice-content strong {
+    display: block;
+    color: #ff6b6b;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.notice-content p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* 無効化されたアイテム */
+.disabled-item {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}

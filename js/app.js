@@ -433,6 +433,9 @@ class StatsManager {
 document.addEventListener('DOMContentLoaded', async function() {
     const statsManager = new StatsManager();
     await updateDisplay(statsManager);
+
+    // テストモードバナーを表示
+    showTestModeBannerIfNeeded();
 });
 
 // 表示を更新
@@ -454,6 +457,34 @@ async function updateDisplay(statsManager) {
 
         // アニメーション効果
         todayWordsElement.style.animation = 'countUp 0.5s ease-out';
+    }
+}
+
+// テストモードバナーを表示（必要な場合）
+function showTestModeBannerIfNeeded() {
+    const isTestMode = localStorage.getItem('testMode') === 'true';
+
+    if (isTestMode) {
+        // バナーがまだ存在しない場合は作成
+        let banner = document.getElementById('testModeBanner');
+
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'testModeBanner';
+            banner.className = 'test-mode-banner';
+            banner.innerHTML = `
+                <span class="test-mode-icon">🧪</span>
+                <span class="test-mode-text">テストモード</span>
+            `;
+
+            // containerの最初の子要素として挿入
+            const container = document.querySelector('.container');
+            if (container && container.firstChild) {
+                container.insertBefore(banner, container.firstChild);
+            }
+        }
+
+        banner.style.display = 'flex';
     }
 }
 

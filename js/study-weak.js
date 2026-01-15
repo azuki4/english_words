@@ -124,6 +124,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function handleRating(rating) {
         console.log(`評価: ${rating}, 単語: ${currentWord.word}`);
 
+        // テストモードチェック
+        const isTestMode = localStorage.getItem('testMode') === 'true';
+
+        if (isTestMode) {
+            console.log('🧪 テストモード: データは更新されません');
+            // 次の単語を表示（データ更新なし）
+            showWeightedRandomWord();
+            return;
+        }
+
         const statsManager = new StatsManager();
 
         // 記憶度を更新
