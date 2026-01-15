@@ -1167,9 +1167,3 @@ body {
     line-height: 1.5;
 }
 
-/* 無効化されたアイテム */
-.disabled-item {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
-}
