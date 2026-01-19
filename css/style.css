@@ -20,6 +20,7 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    padding-bottom: 100px;
 }
 
 /* ヘッダー統計エリア */
@@ -85,11 +86,18 @@ body {
 
 /* 下部ナビゲーション */
 .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 480px;
+    margin: 0 auto;
     display: flex;
     background: white;
     border-top: 1px solid #e0e0e0;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     padding: 0.5rem;
+    z-index: 100;
 }
 
 .nav-button {
@@ -135,6 +143,10 @@ body {
 /* レスポンシブ対応 */
 @media (max-width: 480px) {
     .container {
+        max-width: 100%;
+    }
+
+    .bottom-nav {
         max-width: 100%;
     }
 
@@ -1166,4 +1178,3 @@ body {
     margin: 0;
     line-height: 1.5;
 }
-
