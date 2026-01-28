@@ -329,15 +329,19 @@ class StatsManager {
 
                 // 基準日付が存在し、今日と異なる場合のみ減衰処理
                 if (lastStudiedDate && lastStudiedDate !== today) {
-                    let newScore;
+                    const daysDiff = this.getDaysDifference(lastStudiedDate, today);
+                    let newScore = currentScore;
 
-                    if (currentScore < 80) {
-                        // 記憶度が80未満の場合: x(n+4)/(n+5)
-                        const daysDiff = this.getDaysDifference(lastStudiedDate, today);
-                        newScore = currentScore * (daysDiff + 4) / (daysDiff + 5);
-                    } else {
-                        // 記憶度が80以上の場合: -1
-                        newScore = currentScore - 1;
+                    // 経過日数分の減衰を日ごとにシミュレート
+                    // n: 最後に学習した日からの経過日数（1から開始）
+                    for (let n = 1; n <= daysDiff; n++) {
+                        if (newScore >= 80) {
+                            // 記憶度が80以上の場合: -1
+                            newScore = newScore - 1;
+                        } else {
+                            // 記憶度が80未満の場合: ×(n+4)/(n+5)
+                            newScore = newScore * (n + 4) / (n + 5);
+                        }
                     }
 
                     // 0~100の範囲に制限
