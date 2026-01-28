@@ -3,47 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学習 - 英単語学習アプリ</title>
+    <title>グループ管理 - 英単語学習アプリ</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 上部：統計情報 -->
-        <header class="stats-header">
-            <h1>学習</h1>
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="stat-label">総単語数</div>
-                    <div class="stat-value" id="totalWords">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">今日の学習</div>
-                    <div class="stat-value" id="todayWords">0</div>
-                </div>
-            </div>
+        <!-- 上部：ヘッダー -->
+        <header class="page-header">
+            <a href="settings.html" class="back-button">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <h1>グループ管理</h1>
+            <a href="add-group.html" class="header-action-button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="24" height="24">
+                    <path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
         </header>
 
         <!-- メインコンテンツエリア -->
-        <main class="main-content study-content">
-            <div class="study-menu">
-                <a href="study-en-ja.html" class="study-menu-button">
-                    <div class="study-menu-icon">🇬🇧→🇯🇵</div>
-                    <div class="study-menu-title">英単語 → 日本語</div>
-                    <div class="study-menu-desc">英単語を見て日本語訳を答える</div>
-                </a>
-                <a href="study-ja-en.html" class="study-menu-button">
-                    <div class="study-menu-icon">🇯🇵→🇬🇧</div>
-                    <div class="study-menu-title">日本語 → 英単語</div>
-                    <div class="study-menu-desc">日本語を見て英単語を答える</div>
-                </a>
+        <main class="main-content group-management-content">
+            <div class="group-list" id="groupList">
+                <!-- JavaScriptで動的にグループを表示 -->
             </div>
 
-            <div class="group-select-section">
-                <label for="studyGroupSelect" class="group-select-label">学習グループ:</label>
-                <select id="studyGroupSelect" class="group-select">
-                    <option value="__all__">登録済み単語</option>
-                    <!-- JavaScriptで動的にグループを追加 -->
-                </select>
+            <div class="empty-message" id="emptyMessage" style="display: none;">
+                <p>グループがありません</p>
+                <a href="add-group.html" class="btn btn-primary">グループを作成する</a>
             </div>
         </main>
 
@@ -55,13 +43,13 @@
                 </svg>
                 <span>メイン</span>
             </a>
-            <a href="study.html" class="nav-button study-btn active">
+            <a href="study.html" class="nav-button study-btn">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <span>学習</span>
             </a>
-            <a href="settings.html" class="nav-button settings-btn">
+            <a href="settings.html" class="nav-button settings-btn active">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -80,6 +68,6 @@
 
     <!-- アプリのスクリプト -->
     <script src="js/app.js"></script>
-    <script src="js/study.js"></script>
+    <script src="js/group-management.js"></script>
 </body>
 </html>

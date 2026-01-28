@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>グループ作成 - 英単語学習アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 上部：ヘッダー -->
+        <header class="page-header">
+            <a href="group-management.html" class="back-button">
+                <svg class="back-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <h1>グループ作成</h1>
+            <button class="header-action-button" id="createGroupBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="24" height="24">
+                    <path d="M5 13l4 4L19 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- メインコンテンツエリア -->
+        <main class="main-content add-group-content">
+            <div class="add-group-controls">
+                <div class="sort-options">
+                    <label for="sortSelect">並び替え:</label>
+                    <select id="sortSelect" class="sort-select">
+                        <option value="alphabet">アルファベット順</option>
+                        <option value="date-new">登録日順（新しい順）</option>
+                        <option value="date-old">登録日順（古い順）</option>
+                    </select>
+                </div>
+                <div class="selection-count">
+                    選択中: <span id="selectedCount">0</span>単語
+                </div>
+            </div>
+
+            <div class="word-selection-list" id="wordSelectionList">
+                <!-- JavaScriptで動的に単語を表示 -->
+            </div>
+
+            <div class="empty-message" id="emptyMessage" style="display: none;">
+                <p>単語が登録されていません</p>
+                <a href="add-words.html" class="btn btn-primary">単語を追加する</a>
+            </div>
+        </main>
+
+        <!-- グループ名入力モーダル -->
+        <div id="groupNameModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>グループ名を入力</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">グループ名 <span class="required">※必須</span></label>
+                        <input type="text" id="groupNameInput" class="form-input" placeholder="例: TOEIC基礎">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelBtn" class="btn btn-secondary">戻る</button>
+                    <button id="confirmCreateBtn" class="btn btn-primary">グループを作成</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下部：ナビゲーションボタン -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-button home-btn">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>メイン</span>
+            </a>
+            <a href="study.html" class="nav-button study-btn">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>学習</span>
+            </a>
+            <a href="settings.html" class="nav-button settings-btn active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>設定</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase設定 -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- アプリのスクリプト -->
+    <script src="js/app.js"></script>
+    <script src="js/add-group.js"></script>
+</body>
+</html>

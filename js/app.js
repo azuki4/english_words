@@ -444,6 +444,105 @@ class StatsManager {
             return false;
         }
     }
+
+    // ========== グループ関連のメソッド ==========
+
+    // 全グループを取得
+    async getGroups() {
+        try {
+            const snapshot = await db.collection('groups').get();
+            const groups = [];
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                groups.push({
+                    id: doc.id,
+                    name: data.name,
+                    wordIds: data.wordIds || [],
+                    createdAt: data.createdAt ? data.createdAt.toDate() : new Date()
+                });
+            });
+
+            // 作成日順でソート（古い順）
+            groups.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+            return groups;
+        } catch (error) {
+            console.error('Error getting groups:', error);
+            return [];
+        }
+    }
+
+    // グループを作成
+    async createGroup(name, wordIds) {
+        try {
+            const docRef = await db.collection('groups').add({
+                name: name,
+                wordIds: wordIds,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('グループを作成しました。ID:', docRef.id);
+            return { success: true, id: docRef.id };
+        } catch (error) {
+            console.error('Error creating group:', error);
+            return { success: false };
+        }
+    }
+
+    // グループを削除
+    async deleteGroup(groupId) {
+        try {
+            await db.collection('groups').doc(groupId).delete();
+            console.log('グループを削除しました。ID:', groupId);
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting group:', error);
+            return { success: false };
+        }
+    }
+
+    // グループ内の単語を取得
+    async getWordsByGroup(groupId) {
+        try {
+            // 「登録済み単語」グループ（全単語）
+            if (groupId === '__all__') {
+                return await this.getWords();
+            }
+
+            // 特定のグループの単語を取得
+            const groupDoc = await db.collection('groups').doc(groupId).get();
+            if (!groupDoc.exists) {
+                console.error('Group not found:', groupId);
+                return [];
+            }
+
+            const groupData = groupDoc.data();
+            const wordIds = groupData.wordIds || [];
+
+            if (wordIds.length === 0) {
+                return [];
+            }
+
+            // 単語IDに対応する単語を取得
+            const allWords = await this.getWords();
+            const groupWords = allWords.filter(word => wordIds.includes(word.id));
+
+            return groupWords;
+        } catch (error) {
+            console.error('Error getting words by group:', error);
+            return [];
+        }
+    }
+
+    // 選択中のグループIDを取得
+    getSelectedGroupId() {
+        return localStorage.getItem('selectedGroupId') || '__all__';
+    }
+
+    // 選択中のグループIDを保存
+    setSelectedGroupId(groupId) {
+        localStorage.setItem('selectedGroupId', groupId);
+    }
 }
 
 // ページ読み込み時の処理

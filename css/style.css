@@ -505,9 +505,13 @@ body {
 
 /* ページヘッダー（戻るボタン付き） */
 .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
+    min-height: 60px;
 }
 
 .back-button {
@@ -516,12 +520,12 @@ body {
     justify-content: center;
     color: white;
     text-decoration: none;
-    margin-bottom: 1rem;
     transition: all 0.3s ease;
     width: 36px;
     height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -539,8 +543,16 @@ body {
 }
 
 .page-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 600;
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+/* 右側にボタンがない場合のスペーサー */
+.page-header h1:last-child {
+    margin-right: 36px; /* back-buttonと同じ幅 */
 }
 
 /* リセット確認ダイアログ */
@@ -1213,4 +1225,186 @@ body {
     font-size: 0.9rem;
     margin: 0;
     line-height: 1.5;
+}
+
+/* ========== グループ関連のスタイル ========== */
+
+/* ヘッダーアクションボタン（右上の+ボタン等） */
+.header-action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.header-action-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.header-action-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* グループ管理ページ */
+.group-management-content {
+    padding: 1.5rem;
+}
+
+.group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.group-item:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.group-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.group-icon {
+    font-size: 1.5rem;
+}
+
+.group-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.group-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.group-word-count {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* グループ追加ページ */
+.add-group-content {
+    padding: 1rem 1.5rem;
+}
+
+.add-group-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.selection-count {
+    font-size: 0.9rem;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.word-selection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.word-selection-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.word-selection-item:hover {
+    border-color: #667eea;
+}
+
+.word-selection-item.selected {
+    background: #e8f5e9;
+    border-color: #81c784;
+}
+
+.word-selection-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.word-selection-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.word-selection-translation {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* 学習ページのグループ選択 */
+.group-select-section {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #f8f9ff;
+    border-radius: 12px;
+}
+
+.group-select-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.group-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.group-select:hover {
+    border-color: #667eea;
+}
+
+.group-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
 }
