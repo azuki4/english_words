@@ -151,19 +151,32 @@ class StatsManager {
         try {
             const snapshot = await db.collection(COLLECTION_NAME).get();
 
+            // createdAtがない場合のデフォルト日付（2026/1/28）
+            const defaultCreatedAt = new Date('2026-01-28T00:00:00+09:00');
+
             const words = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
+
+                // createdAtの処理: FirestoreのタイムスタンプをDateに変換
+                let createdAt;
+                if (data.createdAt && data.createdAt.toDate) {
+                    createdAt = data.createdAt.toDate();
+                } else {
+                    createdAt = defaultCreatedAt;
+                }
+
                 words.push({
                     id: doc.id,  // ドキュメントIDを追加
                     word: data.word,
                     translations: data.translations || [],
                     memoryScore: data.memoryScore !== undefined ? data.memoryScore : 50.0,
-                    lastStudiedDate: data.lastStudiedDate || null
+                    lastStudiedDate: data.lastStudiedDate || null,
+                    createdAt: createdAt
                 });
             });
 
-            // クライアント側でアルファベット順にソート
+            // クライアント側でアルファベット順にソート（デフォルト）
             words.sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
 
             return words;

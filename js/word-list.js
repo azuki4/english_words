@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const wordList = document.getElementById('wordList');
     const wordCount = document.getElementById('wordCount');
     const emptyMessage = document.getElementById('emptyMessage');
+    const sortSelect = document.getElementById('sortSelect');
 
     // 編集モーダル関連
     const editModal = document.getElementById('editModal');
@@ -16,7 +17,23 @@ document.addEventListener('DOMContentLoaded', async function() {
     let currentEditingId = null;
     let editTranslationCount = 0;
 
+    // ソート設定をLocalStorageから復元
+    const SORT_STORAGE_KEY = 'wordListSortType';
+    let currentSortType = localStorage.getItem(SORT_STORAGE_KEY) || 'alphabet';
+
     if (wordList && wordCount && emptyMessage) {
+        // ソート選択の初期値を設定
+        if (sortSelect) {
+            sortSelect.value = currentSortType;
+
+            // ソート選択変更時のイベントリスナー
+            sortSelect.addEventListener('change', async function() {
+                currentSortType = sortSelect.value;
+                localStorage.setItem(SORT_STORAGE_KEY, currentSortType);
+                await displayWords();
+            });
+        }
+
         // データ移行処理を実行（既存データに記憶度フィールドを追加）
         const statsManager = new StatsManager();
         await statsManager.migrateWordData();
@@ -47,6 +64,23 @@ document.addEventListener('DOMContentLoaded', async function() {
         // 単語がある場合
         wordList.style.display = 'block';
         emptyMessage.style.display = 'none';
+
+        // ソート選択に応じてソート
+        switch (currentSortType) {
+            case 'date-new':
+                // 登録日順（新しい順）
+                words.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+                break;
+            case 'date-old':
+                // 登録日順（古い順）
+                words.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+                break;
+            case 'alphabet':
+            default:
+                // アルファベット順（getWords()で既にソート済みだが念のため）
+                words.sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));
+                break;
+        }
 
         // 単語を表示（既にアルファベット順にソート済み）
         wordList.innerHTML = '';
