@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テスト実行 - 英単語学習アプリ</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- テスト中の画面 -->
+        <div id="testScreen">
+            <!-- 上部：進捗 -->
+            <header class="test-header">
+                <h1>問題 <span id="currentQuestion">1</span>/10</h1>
+            </header>
+
+            <!-- メインコンテンツエリア -->
+            <main class="main-content test-run-content">
+                <div class="question-section">
+                    <div class="question-label">この単語の英語は？</div>
+                    <div class="question-word" id="questionWord">読み込み中...</div>
+                </div>
+
+                <div class="answer-section">
+                    <input type="text" id="answerInput" class="answer-input" placeholder="英語を入力" autocomplete="off" autocapitalize="off">
+                    <button id="submitAnswerBtn" class="btn btn-primary btn-large">回答</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- テスト結果画面 -->
+        <div id="resultScreen" style="display: none;">
+            <!-- 上部：結果 -->
+            <header class="test-header result-header">
+                <h1>テスト結果</h1>
+            </header>
+
+            <!-- メインコンテンツエリア -->
+            <main class="main-content test-result-content">
+                <div class="score-section">
+                    <div class="score-value"><span id="scoreValue">0</span> / 10 点</div>
+                </div>
+
+                <div class="result-list" id="resultList">
+                    <!-- JavaScriptで動的に結果を表示 -->
+                </div>
+
+                <div class="finish-section">
+                    <a href="test.html" class="btn btn-primary btn-large">終了</a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase設定 -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- アプリのスクリプト -->
+    <script src="js/app.js"></script>
+    <script src="js/test-run.js"></script>
+</body>
+</html>
